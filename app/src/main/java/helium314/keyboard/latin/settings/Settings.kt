@@ -362,6 +362,8 @@ class Settings private constructor() : SharedPreferences.OnSharedPreferenceChang
         const val PREF_MORE_AUTO_CORRECTION = "more_auto_correction"
         const val PREF_AUTO_CORRECT_THRESHOLD = "auto_correct_threshold"
         const val PREF_AUTOCORRECT_SHORTCUTS = "autocorrect_shortcuts"
+        const val PREF_AUTO_DETECT_TYPING_LANGUAGE = "auto_detect_typing_language"
+        const val PREF_AUTOCORRECT_ONLY_PREFERRED_LANGUAGE = "autocorrect_only_preferred_language"
         const val PREF_BACKSPACE_REVERTS_AUTOCORRECT = "backspace_reverts_autocorrect"
         const val PREF_AUTO_CORRECT_INDICATOR_UNDERLINE = "auto_correct_indicator_underline"
         const val PREF_BACKSPACE_REPEAT_DELETES_WORDS = "backspace_repeat_deletes_words"

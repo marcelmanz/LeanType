@@ -645,7 +645,8 @@ internal fun getCategoryForPrefKey(key: String): BackupCategory {
         "use_personalized_dicts", "block_potentially_offensive", "next_word_prediction",
         "suggest_emojis", "inline_emoji_search", "show_emoji_descriptions",
         "auto_correction", "more_auto_correction", "auto_correct_threshold",
-        "autocorrect_shortcuts", "backspace_reverts_autocorrect", "suggest_punctuation",
+        "autocorrect_shortcuts", "auto_detect_typing_language", "autocorrect_only_preferred_language",
+        "backspace_reverts_autocorrect", "suggest_punctuation",
         "add_to_personal_dictionary", "add_to_personal_dict_threshold",
         "auto_correct_aggressiveness"
     )
