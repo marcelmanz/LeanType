@@ -311,6 +311,14 @@ class Suggest(private val mDictionaryFacilitator: DictionaryFacilitator) {
             hasAutoCorrection = false
         } else {
             val firstSuggestion = firstSuggestionInContainer ?: suggestionResults.first()
+            val detectedLocale = mDictionaryFacilitator.clearlyPreferredLocale
+            val suggestionLocale = firstSuggestion.mSourceDict?.mLocale
+            if (Settings.getValues().mAutocorrectOnlyPreferredLanguage && detectedLocale != null
+                && suggestionLocale != null && suggestionLocale != detectedLocale
+            ) {
+                // multilingual typing settled on a language, don't replace the word with one from another language
+                return true to false
+            }
             if (suggestionResults.mFirstSuggestionExceedsConfidenceThreshold && firstOccurrenceOfTypedWordInSuggestions != 0) {
                 // mFirstSuggestionExceedsConfidenceThreshold is always set to false, so currently this branch is useless
                 return true to true
