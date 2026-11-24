@@ -828,6 +828,15 @@ class LatinIME : InputMethodService(),
         onCurrentInputMethodSubtypeChanged(subtype)
     }
 
+    fun detectTypingLanguage() {
+        val subtype = subtypeState.getSubtypeForDetectedLocale(
+            dictionaryFacilitator.clearlyPreferredLocale,
+            richImm.currentSubtype.rawSubtype,
+            SubtypeSettings.getEnabledSubtypes()
+        ) ?: return
+        handler.postSwitchLanguage(subtype)
+    }
+
     fun onStartInputInternal(editorInfo: EditorInfo?, restarting: Boolean) {
         super.onStartInput(editorInfo, restarting)
         floatingKeyboardManager?.resetDragAndResizeState()
