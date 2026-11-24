@@ -61,6 +61,9 @@ interface DictionaryFacilitator {
     /** the most "trusted" locale, differs from getMainLocale only if multilingual typing is used */
     val currentLocale: Locale
 
+    /** the locale clearly preferred in multilingual typing, null if not used or no locale is clearly preferred yet */
+    val clearlyPreferredLocale: Locale?
+
     fun usesSameSettings(
         locales: List<Locale>,
         apps: Boolean,
@@ -111,6 +114,9 @@ interface DictionaryFacilitator {
 
     /** adjust confidences for multilingual typing */
     fun adjustConfidences(word: String, wasAutoCapitalized: Boolean)
+
+    /** forget which language was detected, so multilingual typing starts undecided */
+    fun resetConfidences()
 
     /** a string with all used locales and their current confidences, null if multilingual typing is not used */
     fun localesAndConfidences(): String?

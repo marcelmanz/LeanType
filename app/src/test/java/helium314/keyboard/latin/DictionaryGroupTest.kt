@@ -138,4 +138,26 @@ class DictionaryGroupTest {
         assertFalse(isBlacklistedMethod.invoke(instance, "i'm") as Boolean)
         assertTrue(isBlacklistedMethod.invoke(instance, "I,m") as Boolean)
     }
+
+    @Test
+    fun testResetConfidence() {
+        val dictGroupClass = Class.forName("helium314.keyboard.latin.DictionaryGroup")
+        val constructor = dictGroupClass.declaredConstructors.first { it.parameterCount == 4 }
+        constructor.isAccessible = true
+
+        val instance = constructor.newInstance(Locale.ENGLISH, null, emptyMap<String, ExpandableBinaryDictionary>(), null)
+        val increaseConfidenceMethod = dictGroupClass.getDeclaredMethod("increaseConfidence")
+        val decreaseConfidenceMethod = dictGroupClass.getDeclaredMethod("decreaseConfidence")
+        val resetConfidenceMethod = dictGroupClass.getDeclaredMethod("resetConfidence")
+        val getConfidenceMethod = dictGroupClass.getDeclaredMethod("getConfidence")
+        listOf(increaseConfidenceMethod, decreaseConfidenceMethod, resetConfidenceMethod, getConfidenceMethod).forEach { it.isAccessible = true }
+
+        repeat(3) { increaseConfidenceMethod.invoke(instance) }
+        resetConfidenceMethod.invoke(instance)
+        assertEquals(1, getConfidenceMethod.invoke(instance))
+
+        repeat(2) { decreaseConfidenceMethod.invoke(instance) }
+        resetConfidenceMethod.invoke(instance)
+        assertEquals(1, getConfidenceMethod.invoke(instance))
+    }
 }

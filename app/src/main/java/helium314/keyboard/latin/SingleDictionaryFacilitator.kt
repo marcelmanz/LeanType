@@ -101,6 +101,8 @@ class SingleDictionaryFacilitator(private val dict: Dictionary) : DictionaryFaci
 
     override val currentLocale: Locale get() = mainLocale
 
+    override val clearlyPreferredLocale: Locale? get() = null
+
     override fun usesSameSettings(locales: List<Locale>, apps: Boolean, personalization: Boolean): Boolean {
         return locales.singleOrNull() == mainLocale
     }
@@ -124,6 +126,8 @@ class SingleDictionaryFacilitator(private val dict: Dictionary) : DictionaryFaci
     ) {}
 
     override fun adjustConfidences(word: String, wasAutoCapitalized: Boolean) {}
+
+    override fun resetConfidences() {}
 
     override fun unlearnFromUserHistory(word: String, ngramContext: NgramContext, timeStampInSeconds: Long, eventType: Int) {}
 

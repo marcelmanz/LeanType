@@ -951,6 +951,8 @@ class LatinIME : InputMethodService(),
         if (isDifferentTextField) {
             mainKeyboardView.closing()
             inputLogic.suggest.setAutoCorrectionThreshold(currentSettingsValues.mAutoCorrectionThreshold)
+            // TODO: decide whether confidences should reset per field without this setting, see HeliBorg/HeliBoard#2124
+            if (currentSettingsValues.mAutoDetectTypingLanguage) dictionaryFacilitator.resetConfidences()
             switcher.clearTransientShiftState()
             switcher.reloadMainKeyboard()
             if (needToCallLoadKeyboardLater) switcher.saveKeyboardState()
