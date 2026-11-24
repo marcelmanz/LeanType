@@ -186,6 +186,10 @@
     <string name="auto_correct_shortcuts">Auto-correct shortcuts</string>
     <!-- Description for auto_correct_shortcuts -->
     <string name="auto_correct_shortcuts_summary">When enabled shortcuts might be expanded by autocorrect</string>
+    <string name="auto_detect_typing_language">Auto-detect typing language</string>
+    <string name="auto_detect_typing_language_summary">Switch to the language of the first words typed in each field. Requires multilingual typing on the current language.</string>
+    <string name="autocorrect_only_preferred_language">Auto-correct only in detected language</string>
+    <string name="autocorrect_only_preferred_language_summary">With multilingual typing, only auto-correct to words of the language you are typing in</string>
     <string name="prefs_physical_keyboard_suggestion_shortcuts">Physical keyboard suggestion shortcuts</string>
     <string name="prefs_physical_keyboard_suggestion_shortcuts_summary">Select suggestion candidates using keyboard shortcuts and show number badges</string>
     <string name="physical_keyboard_shortcut_disabled">Disabled</string>

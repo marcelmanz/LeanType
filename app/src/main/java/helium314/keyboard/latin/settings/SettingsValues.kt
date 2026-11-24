@@ -219,6 +219,8 @@ open class SettingsValues(
     val mAutoCorrectEnabled: Boolean
     val mAutoCorrectionThreshold: Float
     val mAutoCorrectShortcuts: Boolean
+    val mAutoDetectTypingLanguage: Boolean
+    val mAutocorrectOnlyPreferredLanguage: Boolean
     val mRememberFloatingKeyboard: Boolean
     val mFloatingKeyboardLandscape: Boolean
     val mPersistTextEditMode: Boolean
@@ -357,6 +359,8 @@ open class SettingsValues(
         mAutoCorrectionThreshold = if (mAutoCorrectEnabled) prefs.getFloat(Settings.PREF_AUTO_CORRECT_THRESHOLD, Defaults.PREF_AUTO_CORRECT_THRESHOLD) else Float.MAX_VALUE
         mScoreLimitForAutocorrect = if (mAutoCorrectionThreshold < 0) 600000 else (if (mAutoCorrectionThreshold < 0.07f) 800000 else 950000)
         mAutoCorrectShortcuts = prefs.getBoolean(Settings.PREF_AUTOCORRECT_SHORTCUTS, Defaults.PREF_AUTOCORRECT_SHORTCUTS)
+        mAutoDetectTypingLanguage = prefs.getBoolean(Settings.PREF_AUTO_DETECT_TYPING_LANGUAGE, Defaults.PREF_AUTO_DETECT_TYPING_LANGUAGE)
+        mAutocorrectOnlyPreferredLanguage = prefs.getBoolean(Settings.PREF_AUTOCORRECT_ONLY_PREFERRED_LANGUAGE, Defaults.PREF_AUTOCORRECT_ONLY_PREFERRED_LANGUAGE)
         mRememberFloatingKeyboard = prefs.getBoolean(Settings.PREF_REMEMBER_FLOATING_KEYBOARD, Defaults.PREF_REMEMBER_FLOATING_KEYBOARD)
         mFloatingKeyboardLandscape = prefs.getBoolean(Settings.PREF_FLOATING_KEYBOARD_LANDSCAPE, Defaults.PREF_FLOATING_KEYBOARD_LANDSCAPE)
         mPersistTextEditMode = prefs.getBoolean(Settings.PREF_PERSIST_TEXT_EDIT_MODE, Defaults.PREF_PERSIST_TEXT_EDIT_MODE)
