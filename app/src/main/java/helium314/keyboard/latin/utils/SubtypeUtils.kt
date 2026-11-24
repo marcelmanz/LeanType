@@ -11,6 +11,7 @@ import helium314.keyboard.latin.common.Constants.Separators
 import helium314.keyboard.latin.common.Constants.Subtype.ExtraValue
 import helium314.keyboard.latin.common.Constants.Subtype.ExtraValue.KEYBOARD_LAYOUT_SET
 import helium314.keyboard.latin.common.LocaleUtils.constructLocale
+import helium314.keyboard.latin.common.LocaleUtils.getBestMatch
 import helium314.keyboard.latin.common.LocaleUtils.isGoodMatch
 import helium314.keyboard.latin.settings.Defaults
 import helium314.keyboard.latin.settings.Settings
@@ -101,7 +102,7 @@ fun getSecondaryLocales(extraValues: String): List<Locale> =
 
 /** class for tracking subtype switching */
 class SubtypeState(private val switchToSubtype: (InputMethodSubtype?) -> Unit) {
-    // When HintLocales causes a subtype override, we store
+    // When HintLocales or language detection causes a subtype override, we store
     // the overridden subtype here in order to restore it when
     // we switch to another input context that has no HintLocales.
     private var overriddenByLocale: InputMethodSubtype? = null
@@ -109,6 +110,9 @@ class SubtypeState(private val switchToSubtype: (InputMethodSubtype?) -> Unit) {
     private var lastActiveSubtype: InputMethodSubtype? = null
     var currentSubtypeHasBeenUsed = true // starting with true avoids immediate switch
         private set
+
+    private var isDetectingLanguage = false
+    private var wordsCommittedInField = 0
 
     fun setCurrentSubtypeHasBeenUsed() {
         currentSubtypeHasBeenUsed = true
@@ -179,6 +183,32 @@ class SubtypeState(private val switchToSubtype: (InputMethodSubtype?) -> Unit) {
         return null
     }
 
+    fun startLanguageDetection(enabled: Boolean) {
+        isDetectingLanguage = enabled
+        wordsCommittedInField = 0
+    }
+
+    /** @return the enabled subtype to switch to once the words typed in this field clearly belong to its language */
+    fun getSubtypeForDetectedLocale(
+        detectedLocale: Locale?,
+        currentSubtype: InputMethodSubtype,
+        enabledSubtypes: Collection<InputMethodSubtype>
+    ): InputMethodSubtype? {
+        if (!isDetectingLanguage) return null
+        wordsCommittedInField++
+        if (wordsCommittedInField < MIN_WORDS_BEFORE_LANGUAGE_SWITCH) return null
+        if (detectedLocale == null) {
+            isDetectingLanguage = wordsCommittedInField < MAX_WORDS_TO_DETECT_LANGUAGE
+            return null
+        }
+        isDetectingLanguage = false
+        // current subtype first, so it wins over other enabled subtypes of the same language
+        val newSubtype = getBestMatch(detectedLocale, listOf(currentSubtype) + enabledSubtypes) { it.locale() }
+        if (newSubtype == null || newSubtype == currentSubtype) return null
+        if (overriddenByLocale == null) overriddenByLocale = currentSubtype
+        return newSubtype
+    }
+
     fun onSubtypeChanged(oldSubtype: InputMethodSubtype?, newSubtype: InputMethodSubtype?) {
         if (oldSubtype != overriddenByLocale) {
             // Whenever the subtype is changed, clear tracking
@@ -186,6 +216,8 @@ class SubtypeState(private val switchToSubtype: (InputMethodSubtype?) -> Unit) {
             // we no longer have a subtype to automatically switch back to.
             overriddenByLocale = null
         }
+        // switches before the first word come from starting the field, not from the user
+        if (wordsCommittedInField > 0) isDetectingLanguage = false
     }
 
     fun switchSubtype(richImm: RichInputMethodManager) {
@@ -205,5 +237,10 @@ class SubtypeState(private val switchToSubtype: (InputMethodSubtype?) -> Unit) {
         }
         // switchSubtype is called only for internal switching, so let's just switch to the next subtype
         switchToSubtype(richImm.getNextSubtypeInThisIme(true))
+    }
+
+    companion object {
+        const val MIN_WORDS_BEFORE_LANGUAGE_SWITCH = 2
+        const val MAX_WORDS_TO_DETECT_LANGUAGE = 4
     }
 }
