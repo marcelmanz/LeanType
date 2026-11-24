@@ -69,6 +69,7 @@ android {
             isShrinkResources = true  // Enable resource shrinking to reduce APK size and memory usage
             isDebuggable = false
             isJniDebuggable = false
+            applicationIdSuffix = ".fork"
             if (keystorePropertiesFile.exists()) {
                 signingConfig = signingConfigs.getByName("release")
             }
