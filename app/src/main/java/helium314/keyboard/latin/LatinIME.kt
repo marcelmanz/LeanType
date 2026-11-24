@@ -807,6 +807,7 @@ class LatinIME : InputMethodService(),
         val oldSubtype = richImm.currentSubtype.rawSubtype
         if (subtype == oldSubtype) return
         
+        val isFromLanguageDetection = subtypeState.isFromLanguageDetection(subtype)
         subtypeState.onSubtypeChanged(oldSubtype, subtype)
         StatsUtils.onSubtypeChanged(oldSubtype, subtype)
         richImm.onSubtypeChanged(subtype)
@@ -814,7 +815,7 @@ class LatinIME : InputMethodService(),
         loadKeyboard()
         
         suggestionStripView?.setRtl(richImm.currentSubtype.isRtlSubtype)
-        settings.saveSubtypeForApp(richImm.currentSubtype, currentInputEditorInfo.packageName)
+        if (!isFromLanguageDetection) settings.saveSubtypeForApp(richImm.currentSubtype, currentInputEditorInfo.packageName)
         cjkCandidateStripView?.clear()
         cjkCandidateStripView?.visibility = View.GONE
         suggestionStripView?.visibility = View.VISIBLE
@@ -962,6 +963,10 @@ class LatinIME : InputMethodService(),
             inputLogic.suggest.setAutoCorrectionThreshold(currentSettingsValues.mAutoCorrectionThreshold)
             // TODO: decide whether confidences should reset per field without this setting, see HeliBorg/HeliBoard#2124
             if (currentSettingsValues.mAutoDetectTypingLanguage) dictionaryFacilitator.resetConfidences()
+            val canDetectLanguage = currentSettingsValues.mAutoDetectTypingLanguage
+                && currentSettingsValues.mInputAttributes.mShouldShowSuggestions
+                && !InputTypeUtils.isUriOrEmailType(editorInfo.inputType)
+            subtypeState.startLanguageDetection(canDetectLanguage)
             switcher.clearTransientShiftState()
             switcher.reloadMainKeyboard()
             if (needToCallLoadKeyboardLater) switcher.saveKeyboardState()
