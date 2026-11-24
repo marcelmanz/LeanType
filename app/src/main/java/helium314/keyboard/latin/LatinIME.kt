@@ -831,7 +831,7 @@ class LatinIME : InputMethodService(),
 
     fun detectTypingLanguage() {
         val subtype = subtypeState.getSubtypeForDetectedLocale(
-            dictionaryFacilitator.clearlyPreferredLocale,
+            dictionaryFacilitator.detectedLocale,
             richImm.currentSubtype.rawSubtype,
             SubtypeSettings.getEnabledSubtypes()
         ) ?: return
