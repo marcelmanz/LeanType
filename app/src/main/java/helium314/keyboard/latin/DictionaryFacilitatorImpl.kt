@@ -153,6 +153,9 @@ class DictionaryFacilitatorImpl : DictionaryFacilitator {
     override val currentLocale: Locale
         get() = currentlyPreferredDictionaryGroup.locale
 
+    override val clearlyPreferredLocale: Locale?
+        get() = if (dictionaryGroups.size < 2) null else clearlyPreferredDictionaryGroup?.locale
+
     override fun usesSameSettings(locales: List<Locale>, apps: Boolean, personalization: Boolean): Boolean {
         val prefs = mPrefs
         if (prefs != null) {
@@ -558,6 +561,10 @@ class DictionaryFacilitatorImpl : DictionaryFacilitator {
                 it.increaseConfidence()
             else it.decreaseConfidence()
         }
+    }
+
+    override fun resetConfidences() {
+        dictionaryGroups.forEach { it.resetConfidence() }
     }
 
     /** the dictionaryGroup with most confidence, first group when tied  */
@@ -1260,6 +1267,10 @@ private class DictionaryGroup(
         else if (confidence > 0) {
             confidence -= 1
         }
+    }
+
+    fun resetConfidence() {
+        confidence = 1
     }
 
     fun getWeightForLocale(groups: List<DictionaryGroup>, isGesturing: Boolean) =
