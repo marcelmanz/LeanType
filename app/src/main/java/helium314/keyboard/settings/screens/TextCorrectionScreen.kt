@@ -63,10 +63,12 @@ fun TextCorrectionScreen(
             if (autocorrectEnabled) Settings.PREF_BACKSPACE_REVERTS_AUTOCORRECT else null,
             if (autocorrectEnabled) Settings.PREF_AUTO_CORRECT_INDICATOR_UNDERLINE else null,
             Settings.PREF_BACKSPACE_REPEAT_DELETES_WORDS,
+            Settings.PREF_AUTO_DETECT_TYPING_LANGUAGE,
             if (autocorrectEnabled) Settings.PREF_EXPAND_FINE_TUNE_AUTOCORRECT else null,
             if (autocorrectEnabled && fineTuneAutocorrectExpanded) Settings.PREF_AUTO_CORRECT_THRESHOLD else null,
             if (autocorrectEnabled && fineTuneAutocorrectExpanded) Settings.PREF_MORE_AUTO_CORRECTION else null,
             if (autocorrectEnabled && fineTuneAutocorrectExpanded) Settings.PREF_AUTOCORRECT_SHORTCUTS else null,
+            if (autocorrectEnabled && fineTuneAutocorrectExpanded) Settings.PREF_AUTOCORRECT_ONLY_PREFERRED_LANGUAGE else null,
 
             // Capitalization
             R.string.auto_cap,
@@ -175,6 +177,11 @@ fun createCorrectionSettings(context: Context) = listOf(
     ) {
         SwitchPreference(it, Defaults.PREF_AUTOCORRECT_SHORTCUTS)
     },
+    Setting(context, Settings.PREF_AUTOCORRECT_ONLY_PREFERRED_LANGUAGE,
+        R.string.autocorrect_only_preferred_language, R.string.autocorrect_only_preferred_language_summary
+    ) {
+        SwitchPreference(it, Defaults.PREF_AUTOCORRECT_ONLY_PREFERRED_LANGUAGE)
+    },
     Setting(context, Settings.PREF_AUTO_CORRECT_THRESHOLD, R.string.auto_correction_confidence) { setting ->
         val items = listOf(
             stringResource(R.string.auto_correction_threshold_mode_modest) to 0.185f,
@@ -210,6 +217,11 @@ fun createCorrectionSettings(context: Context) = listOf(
         R.string.backspace_repeat_deletes_words, R.string.backspace_repeat_deletes_words_summary
     ) {
         SwitchPreference(it, Defaults.PREF_BACKSPACE_REPEAT_DELETES_WORDS)
+    },
+    Setting(context, Settings.PREF_AUTO_DETECT_TYPING_LANGUAGE,
+        R.string.auto_detect_typing_language, R.string.auto_detect_typing_language_summary
+    ) {
+        SwitchPreference(it, Defaults.PREF_AUTO_DETECT_TYPING_LANGUAGE)
     },
     Setting(context, Settings.PREF_AUTO_CAP,
         R.string.auto_cap, R.string.auto_cap_summary
