@@ -2292,18 +2292,17 @@ class InputLogic(
         val word = stripWordSeparatorsFromEnd(plainSuggestion, settingsValues)
         if (settingsValues.mIncognitoModeEnabled) {
             mDictionaryFacilitator.adjustConfidences(word, wasAutoCapitalized)
-            return
-        }
-        if (mConnection.hasSlowInputConnection()) {
+        } else if (mConnection.hasSlowInputConnection()) {
             Log.w(TAG, "Skipping learning due to slow InputConnection.")
             mDictionaryFacilitator.adjustConfidences(word, wasAutoCapitalized)
-            return
+        } else {
+            val timeStampInSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
+            mDictionaryFacilitator.addToUserHistory(
+                word, wasAutoCapitalized, ngramContext,
+                timeStampInSeconds, settingsValues.mBlockPotentiallyOffensive
+            )
         }
-        val timeStampInSeconds = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
-        mDictionaryFacilitator.addToUserHistory(
-            word, wasAutoCapitalized, ngramContext,
-            timeStampInSeconds, settingsValues.mBlockPotentiallyOffensive
-        )
+        mLatinIME.detectTypingLanguage()
     }
 
     private fun stripWordSeparatorsFromEnd(word: String, settingsValues: SettingsValues): String {
