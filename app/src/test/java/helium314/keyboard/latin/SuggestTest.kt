@@ -50,6 +50,7 @@ class SuggestTest {
         ShadowLog.stream = System.out
         DeviceProtectedUtils.getSharedPreferences(latinIME)
             .edit { putBoolean(Settings.PREF_AUTO_CORRECTION, true) } // need to enable, off by default
+        detectedTypingLocale = null
     }
 
     @Test fun `'on' to 'in' if 'in' was used before in this context`() {
@@ -267,6 +268,34 @@ class SuggestTest {
         assert(!result.last()) // should not be corrected
     }
 
+    @Test fun `no autocorrect to another language than the detected one when setting is on`() {
+        latinIME.prefs().edit { putBoolean(Settings.PREF_AUTOCORRECT_ONLY_PREFERRED_LANGUAGE, true) }
+        detectedTypingLocale = Locale.ENGLISH
+        val result = shouldBeAutoCorrected(
+            "recpa",
+            listOf(suggestion("recep", 300000, Locale.ITALIAN)),
+            null,
+            null,
+            Locale.ENGLISH,
+            thresholdModest
+        )
+        assert(!result.last()) // should not be corrected
+    }
+
+    @Test fun `autocorrect to another language than the detected one when setting is off`() {
+        latinIME.prefs().edit { putBoolean(Settings.PREF_AUTOCORRECT_ONLY_PREFERRED_LANGUAGE, false) }
+        detectedTypingLocale = Locale.ENGLISH
+        val result = shouldBeAutoCorrected(
+            "recpa",
+            listOf(suggestion("recep", 300000, Locale.ITALIAN)),
+            null,
+            null,
+            Locale.ENGLISH,
+            thresholdModest
+        )
+        assert(result.last()) // should be corrected
+    }
+
     @Test fun `quotes are added to suggestions when needed`() {
         val result = Suggest.getTransformedSuggestedWordInfo(suggestion("word", 1, Locale.ENGLISH, true),
             Locale.ENGLISH, false, false, 1)
@@ -399,6 +428,7 @@ class SuggestTest {
 }
 
 private var currentTypingLocale = Locale.ENGLISH
+private var detectedTypingLocale: Locale? = null
 
 fun suggestion(word: String, score: Int, locale: Locale, shortcut: Boolean = false) =
     SuggestedWordInfo(
@@ -421,6 +451,8 @@ fun suggestion(word: String, score: Int, locale: Locale, shortcut: Boolean = fal
 class ShadowFacilitator {
     @Implementation
     fun getCurrentLocale(): Locale = currentTypingLocale
+    @Implementation
+    fun getClearlyPreferredLocale(): Locale? = detectedTypingLocale
     @Implementation
     fun hasAtLeastOneInitializedMainDictionary() = true // otherwise no autocorrect
 }
