@@ -156,6 +156,12 @@ class DictionaryFacilitatorImpl : DictionaryFacilitator {
     override val clearlyPreferredLocale: Locale?
         get() = if (dictionaryGroups.size < 2) null else clearlyPreferredDictionaryGroup?.locale
 
+    override val detectedLocale: Locale? get() {
+        if (dictionaryGroups.size < 2) return null
+        val leadingIndex = indexOfConfidenceLead(dictionaryGroups.map { it.confidence }) ?: return null
+        return dictionaryGroups[leadingIndex].locale
+    }
+
     override fun usesSameSettings(locales: List<Locale>, apps: Boolean, personalization: Boolean): Boolean {
         val prefs = mPrefs
         if (prefs != null) {
@@ -1050,6 +1056,16 @@ class DictionaryFacilitatorImpl : DictionaryFacilitator {
 
     companion object {
         private val TAG = DictionaryFacilitatorImpl::class.java.simpleName
+
+        const val DETECTION_CONFIDENCE_LEAD = 2
+
+        fun indexOfConfidenceLead(confidences: List<Int>): Int? {
+            val leadingIndex = confidences.indices.maxByOrNull { confidences[it] } ?: return null
+            val leadsEveryOther = confidences.indices.all {
+                it == leadingIndex || confidences[leadingIndex] - confidences[it] >= DETECTION_CONFIDENCE_LEAD
+            }
+            return if (leadsEveryOther) leadingIndex else null
+        }
 
         // HACK: This threshold is being used when adding a capitalized entry in the User History dictionary.
         private const val CAPITALIZED_FORM_MAX_PROBABILITY_FOR_INSERT = 140

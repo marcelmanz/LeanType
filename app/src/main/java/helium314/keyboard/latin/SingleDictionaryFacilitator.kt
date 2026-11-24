@@ -103,6 +103,8 @@ class SingleDictionaryFacilitator(private val dict: Dictionary) : DictionaryFaci
 
     override val clearlyPreferredLocale: Locale? get() = null
 
+    override val detectedLocale: Locale? get() = null
+
     override fun usesSameSettings(locales: List<Locale>, apps: Boolean, personalization: Boolean): Boolean {
         return locales.singleOrNull() == mainLocale
     }

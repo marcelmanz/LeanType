@@ -166,4 +166,52 @@ class DictionaryGroupTest {
         resetConfidenceMethod.invoke(instance)
         assertEquals(1, getConfidenceMethod.invoke(instance))
     }
+
+    @Test
+    fun testIndexOfConfidenceLead() {
+        assertEquals(0, DictionaryFacilitatorImpl.indexOfConfidenceLead(listOf(4, 2)))
+        assertEquals(1, DictionaryFacilitatorImpl.indexOfConfidenceLead(listOf(1, 3, 0)))
+        assertNull(DictionaryFacilitatorImpl.indexOfConfidenceLead(listOf(3, 2)))
+        assertNull(DictionaryFacilitatorImpl.indexOfConfidenceLead(listOf(5, 5, 0)))
+        assertNull(DictionaryFacilitatorImpl.indexOfConfidenceLead(listOf(1, 1)))
+        assertNull(DictionaryFacilitatorImpl.indexOfConfidenceLead(emptyList()))
+    }
+
+    @Test
+    fun testConfidenceLeadAfterSharedWords() {
+        val english = setOf("no", "me", "so", "what", "do", "you", "think")
+        val spanish = setOf("no", "me", "so", "gusta", "nada", "esto")
+
+        assertEquals(listOf(null, null, 1), leadingIndexAfterEachWord("no me gusta", english, spanish))
+        assertEquals(listOf(null, 0), leadingIndexAfterEachWord("so what", english, spanish))
+    }
+
+    @Test
+    fun testNoConfidenceLeadWhileWordsAreShared() {
+        val english = setOf("no", "me", "real", "final")
+        val spanish = setOf("no", "me", "real", "final")
+
+        assertEquals(listOf(null, null, null, null), leadingIndexAfterEachWord("no me real final", english, spanish))
+    }
+
+    private fun leadingIndexAfterEachWord(text: String, vararg wordsPerGroup: Set<String>): List<Int?> {
+        val dictGroupClass = Class.forName("helium314.keyboard.latin.DictionaryGroup")
+        val constructor = dictGroupClass.declaredConstructors.first { it.parameterCount == 4 }
+        constructor.isAccessible = true
+        val increaseConfidenceMethod = dictGroupClass.getDeclaredMethod("increaseConfidence")
+        val decreaseConfidenceMethod = dictGroupClass.getDeclaredMethod("decreaseConfidence")
+        val getConfidenceMethod = dictGroupClass.getDeclaredMethod("getConfidence")
+        listOf(increaseConfidenceMethod, decreaseConfidenceMethod, getConfidenceMethod).forEach { it.isAccessible = true }
+
+        val groups = wordsPerGroup.map {
+            constructor.newInstance(Locale.ENGLISH, null, emptyMap<String, ExpandableBinaryDictionary>(), null)
+        }
+        return text.split(" ").map { word ->
+            groups.forEachIndexed { index, group ->
+                if (word in wordsPerGroup[index]) increaseConfidenceMethod.invoke(group)
+                else decreaseConfidenceMethod.invoke(group)
+            }
+            DictionaryFacilitatorImpl.indexOfConfidenceLead(groups.map { getConfidenceMethod.invoke(it) as Int })
+        }
+    }
 }

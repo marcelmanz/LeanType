@@ -64,6 +64,9 @@ interface DictionaryFacilitator {
     /** the locale clearly preferred in multilingual typing, null if not used or no locale is clearly preferred yet */
     val clearlyPreferredLocale: Locale?
 
+    /** the locale whose confidence leads every other locale by a margin, null if multilingual typing is not used or no locale leads yet */
+    val detectedLocale: Locale?
+
     fun usesSameSettings(
         locales: List<Locale>,
         apps: Boolean,
