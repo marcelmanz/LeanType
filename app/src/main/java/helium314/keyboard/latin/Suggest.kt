@@ -313,9 +313,8 @@ class Suggest(private val mDictionaryFacilitator: DictionaryFacilitator) {
             val firstSuggestion = firstSuggestionInContainer ?: suggestionResults.first()
             val detectedLocale = mDictionaryFacilitator.clearlyPreferredLocale
             val suggestionLocale = firstSuggestion.mSourceDict?.mLocale
-            if (Settings.getValues().mAutocorrectOnlyPreferredLanguage && detectedLocale != null
-                && suggestionLocale != null && suggestionLocale != detectedLocale
-            ) {
+            val isSuggestionFromOtherLanguage = detectedLocale != null && suggestionLocale != null && suggestionLocale != detectedLocale
+            if (Settings.getValues().mAutocorrectOnlyPreferredLanguage && isSuggestionFromOtherLanguage) {
                 // multilingual typing settled on a language, don't replace the word with one from another language
                 return true to false
             }

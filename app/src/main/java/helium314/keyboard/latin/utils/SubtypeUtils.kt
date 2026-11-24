@@ -205,7 +205,8 @@ class SubtypeState(private val switchToSubtype: (InputMethodSubtype?) -> Unit) {
         isDetectingLanguage = false
         // current subtype first, so it wins over other enabled subtypes of the same language
         val newSubtype = getBestMatch(detectedLocale, listOf(currentSubtype) + enabledSubtypes) { it.locale() }
-        if (newSubtype == null || newSubtype == currentSubtype) return null
+        val hasOtherSubtypeForLanguage = newSubtype != null && newSubtype != currentSubtype
+        if (!hasOtherSubtypeForLanguage) return null
         if (overriddenByLocale == null) overriddenByLocale = currentSubtype
         subtypeFromLanguageDetection = newSubtype
         return newSubtype
@@ -221,7 +222,8 @@ class SubtypeState(private val switchToSubtype: (InputMethodSubtype?) -> Unit) {
             overriddenByLocale = null
         }
         // switches before the first word come from starting the field, not from the user
-        if (wordsCommittedInField > 0) isDetectingLanguage = false
+        val isUserSwitchWhileTyping = wordsCommittedInField > 0
+        if (isUserSwitchWhileTyping) isDetectingLanguage = false
         subtypeFromLanguageDetection = null
     }
 
