@@ -113,6 +113,7 @@ class SubtypeState(private val switchToSubtype: (InputMethodSubtype?) -> Unit) {
 
     private var isDetectingLanguage = false
     private var wordsCommittedInField = 0
+    private var subtypeFromLanguageDetection: InputMethodSubtype? = null
 
     fun setCurrentSubtypeHasBeenUsed() {
         currentSubtypeHasBeenUsed = true
@@ -206,8 +207,11 @@ class SubtypeState(private val switchToSubtype: (InputMethodSubtype?) -> Unit) {
         val newSubtype = getBestMatch(detectedLocale, listOf(currentSubtype) + enabledSubtypes) { it.locale() }
         if (newSubtype == null || newSubtype == currentSubtype) return null
         if (overriddenByLocale == null) overriddenByLocale = currentSubtype
+        subtypeFromLanguageDetection = newSubtype
         return newSubtype
     }
+
+    fun isFromLanguageDetection(subtype: InputMethodSubtype) = subtype == subtypeFromLanguageDetection
 
     fun onSubtypeChanged(oldSubtype: InputMethodSubtype?, newSubtype: InputMethodSubtype?) {
         if (oldSubtype != overriddenByLocale) {
@@ -218,6 +222,7 @@ class SubtypeState(private val switchToSubtype: (InputMethodSubtype?) -> Unit) {
         }
         // switches before the first word come from starting the field, not from the user
         if (wordsCommittedInField > 0) isDetectingLanguage = false
+        subtypeFromLanguageDetection = null
     }
 
     fun switchSubtype(richImm: RichInputMethodManager) {

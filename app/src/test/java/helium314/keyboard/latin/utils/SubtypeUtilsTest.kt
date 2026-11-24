@@ -4,7 +4,9 @@ import android.view.inputmethod.InputMethodSubtype
 import helium314.keyboard.latin.RichInputMethodManager
 import helium314.keyboard.latin.common.Constants
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
@@ -138,6 +140,16 @@ class SubtypeUtilsTest {
         state.commitWord(null)
         state.onSubtypeChanged(english, state.commitWord(Locale("es")))
         assertEquals(english, state.subtypeToRestore())
+    }
+
+    @Test
+    fun testDetectedLanguage_switchIsRecognizedOnce() {
+        val state = detectingSubtypeState()
+        state.commitWord(null)
+        val detectedSubtype = state.commitWord(Locale("es"))!!
+        assertTrue(state.isFromLanguageDetection(detectedSubtype))
+        state.onSubtypeChanged(english, detectedSubtype)
+        assertFalse(state.isFromLanguageDetection(detectedSubtype))
     }
 
     @Test
